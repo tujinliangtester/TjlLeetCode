@@ -94,6 +94,7 @@ public class Class5 {
 		System.out.println("************************************");
 		findChild(afterPastStatusArrayLincked, afterBackStatusArrayLincked, 31, deepArrayList);
 		System.out.println(num);
+		//Ìí¼Ó±¸×¢
 	}
 
 	static Stack<Integer> stack = new Stack<Integer>();
