@@ -36,35 +36,28 @@ public class Class004 {
         midValueB = getMidValue(b, midIndexB);
 
 
-        //首先用中位数来判断，然后在需要具体的index或者长度的时候，暂时这样处理，对于有两个中位索引的：
-        //中位数小的：取index[0]；  中位数大的：取index[1]
+        //首先用中位数来判断，然后在需要具体的index或者长度的时候
         int tmpMidIndexA;
         int tmpMidIndexB;
         String jt = judgeType(a, b);
-        if (S2S.equals(jt)) {
-            tmpMidIndexA = midIndexA[0];
-            tmpMidIndexB = midIndexB[0];
-        } else if (S2D.equals(jt)) {
-            tmpMidIndexA = midIndexA[0];
-            tmpMidIndexB = midIndexB[1];
-        } else if (D2S.equals(jt)) {
-            tmpMidIndexA = midIndexA[0];
-            tmpMidIndexB = midIndexB[0];
-        } else {
-            tmpMidIndexA = midIndexA[0];
-            tmpMidIndexB = midIndexB[1];
-        }
 
         if (midValueA - midValueB < equalNum && midValueA - midValueB > -equalNum) {
             midValue = midValueA;
         } else if (midValueA - midValueB > equalNum) {
-            int k = 0;
+            int k = 0, ai = 0, aj = 0, bi = 0, bj = 0;
             //大值中位，等于，小值数组的最大值
             if (midValueA - b[b.length - 1] < equalNum && midValueA - b[b.length - 1] > -equalNum) {
                 k = b.length - 1;
 
-                int[] copyedA = judgeAndCopy(a, tmpMidIndexA - (k - tmpMidIndexB), tmpMidIndexA + 1);
-                int[] copyedB = judgeAndCopy(b, tmpMidIndexB, k + 1);
+                int[] tmpRes=getCopyIndex(jt,midIndexA,midIndexB,k);
+                ai=tmpRes[2];
+                aj=tmpRes[3];
+                bi=tmpRes[4];
+                bj=tmpRes[5];
+
+                int[] copyedA = judgeAndCopy(a, ai, aj);
+                int[] copyedB = judgeAndCopy(b, bi, bj);
+
                 if (copyedA == null || copyedA.length == 0) {
                     return getMidValueByArray(copyedB);
                 }
@@ -77,7 +70,7 @@ public class Class004 {
             //todo 感觉还是乱，不论是索引的起，还是止；还是递归的逻辑，都感觉非常非常的乱！ 后续跟进
             else if (midValueA - b[b.length - 1] > equalNum) {
 
-                k = getCloseIndex(b[b.length - 1], Arrays.copyOfRange(a, 0, midIndexA[0] + 1),tmpMidIndexB);
+                k = getCloseIndex(b[b.length - 1], Arrays.copyOfRange(a, 0, midIndexA[0] + 1), tmpMidIndexB);
                 if (k == -1) {
                     // todo
                     // 做的时候感觉还是太复杂、混淆了，当然也可能这么做本身是对的，只是还需要再理一理
@@ -105,7 +98,7 @@ public class Class004 {
             }
             //大值中位，小于，小值数组的最大值 参考图思路细化1 todo
             else {
-                k = getCloseIndex(midValueA, Arrays.copyOfRange(b, tmpMidIndexB, b.length),tmpMidIndexB);
+                k = getCloseIndex(midValueA, Arrays.copyOfRange(b, tmpMidIndexB, b.length), tmpMidIndexB);
                 if (k == -1) {
 //                    todo
                     //这里暂时和下面的 w<0 中逻辑一样，调试了再说
@@ -164,8 +157,7 @@ public class Class004 {
 
     /*
     //获取m中，与v最接近的值对应的索引
-    // （等于v，或者比v大的最小值索引，这里如果取小于的话，对后面的组合起来的处理可能会有问题）
-    //注意，与前诉逻辑一直，在中位数较小的数组中，找索引，都尽量返回较大的那个，如midIndex[1]
+    // （等于v，或者比v小的最大值索引）
     * @param v:目标值
      * @param m:目标数组
      * @param exIndex:在返回的索引基础上，额外增加的索引值
@@ -175,38 +167,38 @@ public class Class004 {
         int index;
         if (m.length == 0) {
             index = -1;
-            return index+exIndex;
+            return index + exIndex;
         }
         float tmpMidValue = getMidValueByArray(m);
         int[] tmpMidIndex = getMidIndex(m);
 
         if (v - tmpMidValue < equalNum && v - tmpMidValue > -equalNum) {
-            //注意，与前诉逻辑一直，在中位数较小的数组中，找索引，都尽量返回较大的那个
-            return Math.max(tmpMidIndex[1], tmpMidIndex[0])+exIndex;
+            //todo 这也是一个关键地方
+            return Math.max(tmpMidIndex[1], tmpMidIndex[0]) + exIndex;
         } else if (v - tmpMidValue > equalNum) {
             if (m.length == 1) {
                 index = -1;
-                return index+exIndex;
+                return index + exIndex;
             }
-            index = getCloseIndex(v, Arrays.copyOfRange(m, Math.max(tmpMidIndex[1], tmpMidIndex[0]), m.length),Math.max(tmpMidIndex[1], tmpMidIndex[0])-1);
-            if (index <Math.max(tmpMidIndex[1], tmpMidIndex[0])-1) {
-                return  m.length / 2+exIndex;
+            index = getCloseIndex(v, Arrays.copyOfRange(m, Math.max(tmpMidIndex[1], tmpMidIndex[0]), m.length), Math.max(tmpMidIndex[1], tmpMidIndex[0]) - 1);
+            if (index < Math.max(tmpMidIndex[1], tmpMidIndex[0]) - 1) {
+                return m.length / 2 + exIndex;
             }
         } else {
             if (m.length == 1) {
                 if (v > m[0]) {
                     index = -1;
-                    return index+exIndex;
+                    return index + exIndex;
                 }
                 index = 0;
-                return index+exIndex;
+                return index + exIndex;
             }
-            index = getCloseIndex(v, Arrays.copyOfRange(m, 0, m.length / 2),Math.max(tmpMidIndex[1], tmpMidIndex[0]));
-            if (index <Math.max(tmpMidIndex[1], tmpMidIndex[0])) {
-                return  m.length / 2+exIndex;
+            index = getCloseIndex(v, Arrays.copyOfRange(m, 0, m.length / 2), Math.max(tmpMidIndex[1], tmpMidIndex[0]));
+            if (index < Math.max(tmpMidIndex[1], tmpMidIndex[0])) {
+                return m.length / 2 + exIndex;
             }
         }
-        return index+exIndex;
+        return index + exIndex;
     }
 
     static int[] judgeAndCopy(int[] m, int i, int j) {
@@ -229,5 +221,28 @@ public class Class004 {
             return S2D;
         }
         return S2S;
+    }
+
+    static int[] getCopyIndex(String jt, int[] midIndexA, int[] midIndexB, int k) {
+        //tmpRes中，值依次是tmpMidIndexA，tmpMidIndexB，ai，aj，bi，bj
+        int[] tmpRes = new int[6];
+        if (S2S.equals(jt)) {
+            tmpRes[0] = midIndexA[0];
+            tmpRes[1] = midIndexB[0];
+        } else if (S2D.equals(jt)) {
+            tmpRes[0] = midIndexA[0];
+            tmpRes[1] = midIndexB[1];
+        } else if (D2S.equals(jt)) {
+            tmpRes[0] = midIndexA[0];
+            tmpRes[1] = midIndexB[0];
+            tmpRes[2] = tmpRes[0] - (k - tmpRes[1]) + 1;
+            tmpRes[3] = tmpRes[0] + 1;
+            tmpRes[4] = tmpRes[1];
+            tmpRes[5] = k + 1;
+        } else {
+            tmpRes[0] = midIndexA[0];
+            tmpRes[1] = midIndexB[1];
+        }
+        return tmpRes;
     }
 }
