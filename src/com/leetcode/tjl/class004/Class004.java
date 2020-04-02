@@ -45,6 +45,8 @@ public class Class004 {
             midValue = midValueA;
         } else if (midValueA - midValueB > equalNum) {
             int k = 0, ai = 0, aj = 0, bi = 0, bj = 0;
+            tmpMidIndexB=bi;
+
             //大值中位，等于，小值数组的最大值
             if (midValueA - b[b.length - 1] < equalNum && midValueA - b[b.length - 1] > -equalNum) {
                 k = b.length - 1;
@@ -158,6 +160,8 @@ public class Class004 {
     /*
     //获取m中，与v最接近的值对应的索引
     // （等于v，或者比v小的最大值索引）
+    todo 注意，这里有个问题，在取中位数，与getCloseIndex中，对于jt的判定和ai等的取值，是不是统一的？如果不是统一，那应该怎么处理
+    todo 目前的想法只能是对每个jt，逐个进行试验查找，如果上诉两个能一致的话还比较好；另外，如果能将几个jt整合统一就更好了
     * @param v:目标值
      * @param m:目标数组
      * @param exIndex:在返回的索引基础上，额外增加的索引值
