@@ -9,14 +9,14 @@ public class Class004 {
     static final String D2S = "double2single";
     static final String D2D = "double2double";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         int[] a = {3};
         int[] b = {2};
         System.out.println(myMain(a, b));
     }
 
 
-    static float myMain(int[] a, int[] b) {
+    static float myMain(int[] a, int[] b) throws Exception {
         //todo 这里会出现a b 两个数组同时为空的情况，应该是之前迭代逻辑中有异常，待后续调试修改
         if (a.length == 0) {
             if (b.length > 0) {
@@ -45,18 +45,27 @@ public class Class004 {
             midValue = midValueA;
         } else if (midValueA - midValueB > equalNum) {
             int k = 0, ai = 0, aj = 0, bi = 0, bj = 0;
-            tmpMidIndexB=bi;
+            tmpMidIndexB = bi;
 
             //大值中位，等于，小值数组的最大值
             if (midValueA - b[b.length - 1] < equalNum && midValueA - b[b.length - 1] > -equalNum) {
                 k = b.length - 1;
 
-                int[] tmpRes=getCopyIndex(jt,midIndexA,midIndexB,k);
-                ai=tmpRes[2];
-                aj=tmpRes[3];
-                bi=tmpRes[4];
-                bj=tmpRes[5];
-
+                int[] tmpRes = getCopyIndex(jt, midIndexA, midIndexB, k);
+                ai = tmpRes[2];
+                aj = tmpRes[3];
+                bi = tmpRes[4];
+                bj = tmpRes[5];
+                if (ai < 0 && bi < 0) {
+                    throw new Exception("下标都小于0了！");
+                }
+                if (ai < 0) {
+                    bi = bi + ai;
+                    ai = 0;
+                } else if (bi < 0) {
+                    ai = ai + bi;
+                    bi = 0;
+                }
                 int[] copyedA = judgeAndCopy(a, ai, aj);
                 int[] copyedB = judgeAndCopy(b, bi, bj);
 
@@ -206,7 +215,7 @@ public class Class004 {
     }
 
     static int[] judgeAndCopy(int[] m, int i, int j) {
-        if (m.length == 0 || i < 0 || i >= j || j > m.length) {
+        if (m.length == 0 || i >= j || j > m.length) {
             return null;
         }
         return Arrays.copyOfRange(m, i, j);
